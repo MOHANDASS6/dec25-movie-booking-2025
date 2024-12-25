@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Booking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url(./images/movi.webp);
+        }
+        header {
+            background-color: #10af0a;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+        .container {
+            /* background-color: blueviolet; */
+            color: darkred;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .movie-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .movie-item {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            padding: 15px;
+            text-align: center;
+        }
+        .movie-item img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .movie-item h3 {
+            margin: 10px 0;
+            font-size: 1.2rem;
+        }
+        .movie-item p {
+            color: #888;
+            margin-bottom: 15px;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .booking-form {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+        footer {
+            /* background-color: #333; */
+            /* color: white; */
+            /* text-align: center; */
+            /* padding: 1rem; */
+            /* position: fixed; */
+            /* width: 100%; */
+            /* bottom: 0; */
+        }
+
+        /* Seat selection styles */
+        .seating-plan {
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .seating-plan div {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            background-color: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .available {
+            background-color: #28a745;
+        }
+        .selected {
+            background-color: #ffc107;
+        }
+        .booked {
+            background-color: #dc3545;
+            cursor: not-allowed;
+        }
+        
+        /* Responsive Styles */
+        @media screen and (max-width: 768px) {
+            .movie-list {
+                flex-direction: column;
+                align-items: center;
+            }
+            .movie-item {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Karur Cinemas</h1>
+</header>
+
+<div class="container">
+    <!-- <h2>Select a Movie</h2> -->
+
+    <div class="movie-list">
+        <div class="movie-item">
+            <img src="./images/vidhd.jpg" alt="Movie Poster">
+            <h3>Vidaamyuirchi</h3>
+            <p>Genre: Action</p>
+            <button onclick="showBookingForm('Movie Title 1', 250)">Book Now</button>
+
+      
+        </div>
+        <div class="movie-item">
+            <img src="./images/rethd.jpg" alt="Movie Poster">
+            <h3>Retro</h3>
+            <p>Genre: Love</p>
+            <button onclick="showBookingForm('Movie Title 2', 200)">Book Now</button>
+        </div>
+        <div class="movie-item">
+            <img src="./images/thug.jpeg" alt="Movie Poster">
+            <h3>Thug Life</h3>
+            <p>Genre: Drama</p>
+            <button onclick="showBookingForm('Movie Title 3', 220)">Book Now</button>
+        </div>
+        <div class="movie-item">
+            <img src="./images/coolhad.avif" alt="Movie Poster">
+            <h3>Cooli</h3>
+            <p>Genre: Action&crime</p>
+            <button onclick="showBookingForm('Movie Title 3', 220)">Book Now</button>
+        </div>
+    </div>
+
+    <div class="booking-form" id="bookingForm" style="display: none;">
+        <h2>Book Tickets for <span id="movieName"></span></h2>
+        <form id="bookingDetails">
+            <label for="showtime">Select Showtime</label>
+            <select id="showtime">
+                <option value="10:00 AM">10:00 AM</option>
+                <option value="1:00 PM">1:00 PM</option>
+                <option value="4:00 PM">4:00 PM</option>
+                <option value="7:00 PM">7:00 PM</option>
+            </select>
+
+            <!-- <label for="ticketCount">Number of Tickets</label>
+            <select id="ticketCount" onchange="updateTotalPrice()">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select> -->
+
+            <div class="seating-plan" id="seatingPlan">
+                <!-- Seats will be dynamically generated here -->
+            </div>
+
+            <p>Total Price: $<span id="totalPrice">0</span></p>
+
+            <button type="submit">Confirm Booking</button>
+        </form>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2024 Karur cineams. All Rights Reserved.</p>
+</footer>
+
+<script>
+    let moviePrice = 0;
+    let selectedSeats = [];
+
+    function showBookingForm(movieTitle, price) {
+        moviePrice = price;
+        document.getElementById('movieName').innerText = movieTitle;
+        document.getElementById('bookingForm').style.display = 'block';
+        generateSeats();
+        updateTotalPrice();
+    }
+
+    function generateSeats() {
+        const seatingPlan = document.getElementById('seatingPlan');
+        seatingPlan.innerHTML = '';
+        const rows = 5;
+        const cols = 10;
+
+        // Create the seating layout (5 rows and 10 seats per row)
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                const seat = document.createElement('div');
+                seat.classList.add('available');
+                seat.dataset.seatId = `${i + 1}-${j + 1}`;
+                seat.addEventListener('click', function () {
+                    toggleSeatSelection(seat);
+                });
+                seatingPlan.appendChild(seat);
+            }
+        }
+    }
+
+    function toggleSeatSelection(seat) {
+        if (seat.classList.contains('booked')) {
+            return; // Don't allow selecting booked seats
+        }
+        seat.classList.toggle('selected');
+        const seatId = seat.dataset.seatId;
+
+        if (seat.classList.contains('selected')) {
+            selectedSeats.push(seatId);
+        } else {
+            selectedSeats = selectedSeats.filter(seat => seat !== seatId);
+        }
+        updateTotalPrice();
+    }
+
+    function updateTotalPrice() {
+        const ticketCount = selectedSeats.length || document.getElementById('ticketCount').value;
+        const totalPrice = moviePrice * ticketCount;
+        document.getElementById('totalPrice').innerText = totalPrice;
+    }
+
+    document.getElementById('bookingDetails').addEventListener('submit', function(event) {
+        event.preventDefault();
+        if (selectedSeats.length === 0) {
+            alert('Please select at least one seat.');
+        } else {
+            alert('Booking confirmed! Total price: $' + (moviePrice * selectedSeats.length));
+            document.getElementById('bookingForm').style.display = 'none';
+        }
+    });
+</script>
+
+</body>
+</html>
